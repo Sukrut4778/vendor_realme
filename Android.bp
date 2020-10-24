@@ -1,4 +1,5 @@
 /**
+ * Copyright (C) 2020 The Evolution X Project
  * Copyright (C) 2020 The LineageOS Project
  * Copyright (C) 2020 The PixelExperience Project
  *
@@ -35,6 +36,7 @@ cc_prebuilt_library_shared {
 		},
 	},
 	compile_multilib: "both",
+	check_elf_files: false,
 	prefer: true,
 }
 
