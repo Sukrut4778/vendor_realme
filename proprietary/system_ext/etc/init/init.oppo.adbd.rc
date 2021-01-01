@@ -1,0 +1,24 @@
+#/********************************************************************************
+# ** Copyright (C), 2018-2023, OPPO Mobile Comm Corp., Ltd
+# ** OPLUS_FEATURE_STORAGE_USB, All rights reserved.
+# **
+# ** File: - init.oppo.adbd.rc
+# ** Description:
+# **     Euclid : oppo custumize for init.oppo.adbd.rc
+# **
+# ** Version: 1.0
+# ** Date: 2019-06-05
+# ** Author: Xuefeng.Peng@ANDROID.STORAGE
+# **
+# ** ------------------------------- Revision History: ----------------------------
+# ** <author>                        <data>       <version>   <desc>
+# ** ------------------------------------------------------------------------------
+#** Xuefeng.Peng@ANDROID.STORAGE.0      2020-04-08   1.0         Create this moudle for adapt adbd mainline
+#********************************************************************************/
+service oppo_adbd /system/system_ext/bin/oppo_adbd --root_seclabel=u:r:su:s0
+    class core
+    socket adbd seqpacket 660 system system
+    disabled
+    seclabel u:r:adbd:s0
+
+

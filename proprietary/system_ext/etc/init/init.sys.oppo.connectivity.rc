@@ -1,0 +1,190 @@
+
+#================================connectivity wifi related start========================================
+#ifdef OPLUS_FEATURE_WIFI_DUMP
+#JiaoBo.Wang@CONNECTIVITY.WIFI.BASIC.LOG.1162003, 2018/7/02
+#add for wifi dump related log collection and DCS handle, dynamic enable/disable wifi core dump, offer trigger wifi dump API.
+#persist.vendor.connsys.coredump.mode set to enable/disable mtk coredump
+on property:sys.oplus.wifi.dump.mode=*
+    setprop persist.vendor.connsys.coredump.mode ${sys.oplus.wifi.dump.mode}
+
+#detected wifi dump trigger by firmware, touch finish file to notify framework
+on property:vendor.oplus.wifi.dump.failureDesc=*
+    setprop sys.oplus.wifi.dump.failureDesc ${vendor.oplus.wifi.dump.failureDesc}
+
+on property:vendor.oplus.wifi.dump.status=1
+    start touchwifidumpfinishfile
+    setprop vendor.oplus.wifi.dump.status 0
+
+on property:sys.oplus.wifi.dump.enable=1
+    start enablewifidump
+
+on property:sys.oplus.wifi.dump.enable=0
+    start disablewifidump
+
+on property:sys.oplus.wifi.dump.logcollect=1
+    start collectwifidmesg
+
+service touchwifidumpfinishfile /system_ext/bin/init.sys.oppo.wifi.debug.sh "touchwifidumpfinishfile"
+    class core
+    user system
+    group root system misc wifi
+    disabled
+    oneshot
+
+service enablewifidump /system_ext/bin/init.sys.oppo.wifi.debug.sh "enablewifidump"
+    class core
+    user root
+    group root system misc wifi
+    disabled
+    oneshot
+
+service disablewifidump /system_ext/bin/init.sys.oppo.wifi.debug.sh "disablewifidump"
+    class core
+    user root
+    group root system misc wifi
+    disabled
+    oneshot
+
+service collectwifidmesg /system_ext/bin/init.sys.oppo.wifi.debug.sh "collectwifidmesg"
+    class main
+    user system
+    group root system misc wifi
+    disabled
+    oneshot
+#endif /* OPLUS_FEATURE_WIFI_DUMP */
+
+#ifdef OPLUS_FEATURE_WIFI_RUSUPGRADE
+#JiaoBo@CONNECTIVITY.WIFI.BASIC.HARDWARE.2795386, 2020/02/20
+#add for: support auto update function, include mtk fw, mtk wifi.cfg, qcom fw, qcom bdf, qcom ini
+#create and copy to temp rus dir
+on property:sys.oplus.wifi.rus.upgrade.ctl=1
+    start rusWifiFileTransfer
+
+service rusWifiFileTransfer /system_ext/bin/init.sys.oppo.wifi.RusUpgrade.sh rusWifiFileTransfer
+    class main
+    user system
+    group root system misc wifi saures
+    disabled
+    oneshot
+
+#bootup check
+on property:vendor.oplus.wifi.rus.upgrade.ctl=vendor-bootcheck-done
+    start rusWifiBootCheck
+
+service rusWifiBootCheck /system_ext/bin/init.sys.oppo.wifi.RusUpgrade.sh rusWifiBootCheck
+    class main
+    user system
+    group root system misc wifi
+    oneshot
+
+#single entity(objs) upgrade
+on property:vendor.oplus.wifi.rus.upgrade.ctl=vendor-upgradeCheck-done
+    start rusWifiObjsUpgrade
+
+service rusWifiObjsUpgrade /system_ext/bin/init.sys.oppo.wifi.RusUpgrade.sh rusWifiObjsUpgrade
+    class main
+    user system
+    group root system misc wifi
+    disabled
+    oneshot
+#endif /* OPLUS_FEATURE_WIFI_RUSUPGRADE */
+
+#ifdef OPLUS_FEATURE_WIFI_SILENCERECOVERY
+#JiaoBo@CONNECTIVITY.WIFI.BASIC.SWITCH.200809, 2020/07/20
+#Add for: wifi driver recovery
+on property:sys.oplus.wifi.reloaddriver=rmmod-state
+    setprop vendor.oplus.wifi.reloaddriver ${sys.oplus.wifi.reloaddriver}
+
+on property:vendor.oplus.wifi.reloaddriver=idle-state
+    setprop sys.oplus.wifi.reloaddriver ${vendor.oplus.wifi.reloaddriver}
+#endif /* OPLUS_FEATURE_WIFI_SILENCERECOVERY */
+
+#ifdef OPLUS_FEATURE_WIFI_SWITCH
+#JiaoBo@CONNECTIVITY.WIFI.BASIC.SWITCH.1069763, 2020/02/20, Add for collect wifi switch log
+service collectWifiSwitchLog /system_ext/bin/init.sys.oppo.wifi.debug.sh "collectWifiSwitchLog"
+    class main
+    user system
+    group root system misc wifi
+    disabled
+    oneshot
+
+service packWifiSwitchLog /system_ext/bin/init.sys.oppo.wifi.debug.sh "packWifiSwitchLog"
+    class main
+    user system
+    group root system misc wifi
+    disabled
+    oneshot
+
+on property:sys.oplus.wifi.switch.log.ctl=1
+    start collectWifiSwitchLog
+
+on property:sys.oplus.wifi.switch.log.ctl=2
+    stop collectWifiSwitchLog
+
+on property:sys.oplus.wifi.switch.log.ctl=3
+    start packWifiSwitchLog
+#endif /* OPLUS_FEATURE_WIFI_SWITCH */
+
+#ifdef OPLUS_FEATURE_WIFI_SNIFFER
+#LiangXiao@CONNECTIVITY.WIFI.BASIC.SNIFFER.7267, 2020/09/20, Add for collect wifi sniffer log
+service copySnifferLogToSdcard /system_ext/bin/init.sys.oppo.wifi.debug.sh "copysnifferlog"
+    class main
+    user system
+    group root system sdcard_rw everybody
+    disabled
+    oneshot
+
+on property:sys.oplus.wifi.copysnifferlog=1
+    start copySnifferLogToSdcard
+
+#endif /* OPLUS_FEATURE_WIFI_SNIFFER */
+
+#================================connectivity wifi related end==========================================
+
+#================================connectivity bt related start==========================================
+
+
+# ifdef OPLUS_FEATURE_BT_HCI_LOG
+# Laixin@CONNECTIVITY.BT.Basic.Log.70745, add for auto capture hci log
+service countCachedHciLog /system/system_ext/bin/init.sys.oppo.bt.debug.sh "countCachedHciLog"
+    class main
+    user bluetooth
+    group system
+    disabled
+    oneshot
+
+service uploadCachedHciLog /system/system_ext/bin/init.sys.oppo.bt.debug.sh "uploadCachedHciLog"
+    class main
+    user bluetooth
+    group system
+    disabled
+    oneshot
+
+on property:sys.oplus.bt.count_cache_hcilog=1
+    start countCachedHciLog
+
+on property:sys.oplus.bt.cache_hcilog_rus_upload=1
+    start uploadCachedHciLog
+
+service uploadBtSSRDump /system/system_ext/bin/init.sys.oppo.bt.debug.sh "uploadBtSSRDump"
+    class main
+    user system
+    group system root bluetooth
+    disabled
+    oneshot
+
+on property:sys.oplus.bt.collect_bt_ssrdump=1
+    start uploadBtSSRDump
+
+on post-fs-data
+    mkdir /data/oppo/log/DCS/de/network_logs 0777 system system
+    mkdir /data/oppo/log/DCS/en/network_logs 0777 system system
+    mkdir /data/misc/bluetooth/cached_hci 0770 bluetooth bluetooth
+    mkdir /data/oppo/log/DCS/de/network_logs/bt_hci_log 0777 system system
+    mkdir /data/oppo/log/DCS/en/network_logs/bt_hci_log 0777 system system
+    mkdir /data/oppo/log/DCS/de/network_logs/bt_fw_dump 0777 system system
+    mkdir /data/oppo/log/DCS/en/network_logs/bt_fw_dump 0777 system system
+    chmod 777 /data/vendor/ssrdump/
+# endif /* OPLUS_FEATURE_BT_HCI_LOG */
+#================================connectivity bt related end ===========================================
+

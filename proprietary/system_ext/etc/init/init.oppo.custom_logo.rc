@@ -1,0 +1,3 @@
+service replace_splash_logo /system_ext/bin/do_replace_splash_logo.sh
+    class core
+    oneshot

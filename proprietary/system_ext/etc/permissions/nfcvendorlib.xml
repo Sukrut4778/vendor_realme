@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Assist library for VENDOR NFC extensions. -->
+<permissions>
+    <library name="nfcvendorlib"
+        file="/system_ext/framework/nfcvendorlib.jar" />
+</permissions>

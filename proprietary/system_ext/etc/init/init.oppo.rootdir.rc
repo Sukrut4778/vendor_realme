@@ -1,0 +1,219 @@
+#/********************************************************************************
+# ** Copyright (C), 2018-2023, OPPO Mobile Comm Corp., Ltd
+# ** OPLUS_FEATURE_STORAGE_MOUNT, All rights reserved.
+# **
+# ** File: - init.oppo.rootdir.rc
+# ** Description:
+# **     Euclid : oppo custumize for init.oppo.rootdir.rc
+# **
+# ** Version: 1.0
+# ** Date: 2019-06-05
+# ** Author: Xuefeng.Peng@ANDROID.STORAGE
+# **
+# ** ------------------------------- Revision History: ----------------------------
+# ** <author>                        <data>       <version>   <desc>
+# ** ------------------------------------------------------------------------------
+#** Xuefeng.Peng@ANDROID.STORAGE.0      2019-06-05   1.0         Create this moudle
+#********************************************************************************/
+#Ping.Liu@BSP.Fingerprint.Secure 2019/10/24, Add for secure common rc.
+import /odm/init.oppo.seccommon.rc
+#qian.chen@BSP.Fingerprint.Face 2020/05/08, Add for face rc.
+import /odm/init.oplus.face.rc
+
+#ifdef OPLUS_FEATURE_BT_HCI_LOG
+#Laixin@CONNECTIVITY.BT.Basic.Log.70745, add for auto capture hci log
+import /system/system_ext/etc/init/init.sys.oppo.connectivity.rc
+#endif /* OPLUS_FEATURE_BT_HCI_LOG */
+
+on zygote-start && property:ro.crypto.state=encrypted && property:ro.crypto.type=file
+    #Xuefeng.Peng@ANDROID.STORAGE.1596362, 2018/11/30, add for FBE
+    start bspFwUpdate
+
+on property:sys.boot_completed=1
+    #Xuefeng.Peng@ANDROID.STORAGE.1410703, 2018/06/19, Add for support NDIS 5.0
+    write /config/usb_gadget/g1/functions/gsi.rndis/rndis_class_id 1
+    #ifdef OPLUS_THERMAL_CONTROL
+    #Kun.Zhou@ANDROID.POWER, 2020/06/03, Modify for thermal control
+    chown system system /sys/class/thermal/cooling_device18/cur_state
+    #endif /* OPLUS_THERMAL_CONTROL */
+
+on post-fs-data
+    #Jiemin.Zhu@PSW.Android.SELinux, 2017/12/12, create recycle for DCIM before restorecon
+    mkdir /data/.recycle 0770 media_rw media_rw
+    #Jiemin.Zhu@PSW.Android.SELinux, 2018/08/06, Add for skip /data/oppo_lib for chcon exec_type
+    mkdir /data/oppo_lib 0777 root root
+
+    #ifdef /* OPLUS_FEATURE_FONT_FLIP */
+    #JiFeng.Tan@ANDROID.UIFramework, 2020-04-24 : Add for webview flipfont
+    mkdir /data/format_unclear/font 0777 system system
+    chmod 0777 /data/format_unclear/font
+    symlink /system/fonts/Roboto-Thin.ttf /data/format_unclear/font/OplusOSUI-Thin.ttf
+    symlink /system/fonts/Roboto-ThinItalic.ttf /data/format_unclear/font/OplusOSUI-ThinItalic.ttf
+    symlink /system/fonts/Roboto-Light.ttf /data/format_unclear/font/OplusOSUI-Light.ttf
+    symlink /system/fonts/Roboto-LightItalic.ttf /data/format_unclear/font/OplusOSUI-LightItalic.ttf
+    symlink /system/fonts/Roboto-Regular.ttf /data/format_unclear/font/OplusOSUI-Regular.ttf
+    symlink /system/fonts/Roboto-Italic.ttf /data/format_unclear/font/OplusOSUI-Italic.ttf
+    symlink /system/fonts/Roboto-Medium.ttf /data/format_unclear/font/OplusOSUI-Medium.ttf
+    symlink /system/fonts/Roboto-MediumItalic.ttf /data/format_unclear/font/OplusOSUI-MediumItalic.ttf
+    symlink /system/fonts/Roboto-Black.ttf /data/format_unclear/font/OplusOSUI-Black.ttf
+    symlink /system/fonts/Roboto-BlackItalic.ttf /data/format_unclear/font/OplusOSUI-BlackItalic.ttf
+    symlink /system/fonts/Roboto-Bold.ttf /data/format_unclear/font/OplusOSUI-Bold.ttf
+    symlink /system/fonts/Roboto-BoldItalic.ttf /data/format_unclear/font/OplusOSUI-BoldItalic.ttf
+    symlink /system/fonts/OplusOSUI-XThin.ttf /data/format_unclear/font/OplusOSUI-Myanmar.ttf
+
+    mkdir /data/system/font 0777 system system
+    chmod 0777 /data/system/font
+    symlink /system/fonts/Roboto-Thin.ttf /data/system/font/OplusOSUI-Thin.ttf
+    symlink /system/fonts/Roboto-ThinItalic.ttf /data/system/font/OplusOSUI-ThinItalic.ttf
+    symlink /system/fonts/Roboto-Light.ttf /data/system/font/OplusOSUI-Light.ttf
+    symlink /system/fonts/Roboto-LightItalic.ttf /data/system/font/OplusOSUI-LightItalic.ttf
+    symlink /system/fonts/Roboto-Regular.ttf /data/system/font/OplusOSUI-Regular.ttf
+    symlink /system/fonts/Roboto-Italic.ttf /data/system/font/OplusOSUI-Italic.ttf
+    symlink /system/fonts/Roboto-Medium.ttf /data/system/font/OplusOSUI-Medium.ttf
+    symlink /system/fonts/Roboto-MediumItalic.ttf /data/system/font/OplusOSUI-MediumItalic.ttf
+    symlink /system/fonts/Roboto-Black.ttf /data/system/font/OplusOSUI-Black.ttf
+    symlink /system/fonts/Roboto-BlackItalic.ttf /data/system/font/OplusOSUI-BlackItalic.ttf
+    symlink /system/fonts/Roboto-Bold.ttf /data/system/font/OplusOSUI-Bold.ttf
+    symlink /system/fonts/Roboto-BoldItalic.ttf /data/system/font/OplusOSUI-BoldItalic.ttf
+    symlink /system/fonts/OplusOSUI-XThin.ttf /data/system/font/OplusOSUI-Myanmar.ttf
+    #endif /* OPLUS_FEATURE_FONT_FLIP */
+
+    #ifdef /* OPLUS_FEATURE_THEME_FR */
+    #HongWu.Yang@ANDROID.UIFramework, 2020-04-24, add for oppo rom theme
+    mkdir /data/theme 0777 system system
+    chmod 0777 /data/theme
+    #used for themespace store to judge whether need themespace lib.
+    setprop is_can_remove_themespacelib 1
+    #endif  /* OPLUS_FEATURE_THEME_FR */
+
+    #ifdef /* OPLUS_FEATURE_COLOR_UXICON */
+    #Qiu.Yu@ANDROID.UIFramework, 2020-04-24, Add for uxicons
+    mkdir /data/oppo/uxicons 0777 system system
+    chmod 0777 /data/oppo/uxicons
+    #endif /* OPLUS_FEATURE_COLOR_UXICON */
+
+    #ifdef /* OPLUS_FEATURE_LANGUAGE_OVERLAY */
+    #Di.An@ANDROID.UIFramework, 2020-04-24, Add for language
+    mkdir /data/oppo/language 0777 system system
+    chmod 0777 /data/oppo/language
+    #endif /* OPLUS_FEATURE_LANGUAGE_OVERLAY */
+
+    #Linjie.Xu@PSW.AD,2017.10.27:add for coloros app to access the system data file. etc
+    mkdir /data/oppo/psw/ 0777 system system
+    mkdir /data/oppo/psw/powermonitor/ 0777 system system
+    mkdir /data/oppo/psw/powermonitor_backup/ 0777 system system
+    mkdir /data/oppo/log/DCS/en/dcs 0777 system system
+    mkdir /data/oppo/psw/thermal 0777 system system
+    mkdir /data/oppo/log/DCS/de/thermal 0777 system system
+    mkdir /data/oppo/log/DCS/en/thermal 0777 system system
+
+    #ifdef OPLUS_FEATURE_WIFI_CONNECTFAILED
+    mkdir /data/oppo/log/DCS/en/dcs/netlog 0777 system system
+    #endif /* OPLUS_FEATURE_WIFI_CONNECTFAILED */
+
+    #Liangxiang.Liu@AD.Power.PowerMonitor, 2018/02/08, Add for wakeup_stastisc reset
+    chown system system /sys/kernel/wakelock_profiler/wakeup_stastisc_reset
+    chown system system /sys/kernel/wakelock_profiler/active_max
+    chown system system /sys/kernel/wakelock_profiler/kernel_time
+    chmod 0664 /sys/kernel/wakelock_profiler/wakeup_stastisc_reset
+    chmod 0664 /sys/kernel/wakelock_profiler/active_max
+    chmod 0664 /sys/kernel/wakelock_profiler/kernel_time
+
+    #ifdef COLOROS_EDIT
+    #SunYi@Rom.Framework, 2019/11/14, Modify for record temperature per hour
+    mkdir /data/oppo/log/DCS/de/trace_viewer 0764 system system
+    mkdir /data/oppo/log/DCS/en/trace_viewer 0777 system system
+    #endif /* COLOROS_EDIT */
+
+    #ifdef OPLUS_FEATURE_SSR
+    #Zhao.Pan@MULTIMEDIA.AUDIODRIVER.FEATURE.SSR, 2020/06/17,add for adsp ramdump
+    mkdir /data/vendor/mmdump 0777 system system
+    chmod 0777 /data/vendor/mmdump
+    mkdir /data/vendor/mmdump/adsp 0777 system system
+    chmod 0777 /data/vendor/mmdump/adsp
+    #endif /* OPLUS_FEATURE_SSR */
+
+    #ifdef OPLUS_FEATURE_MM_FEEDBACK
+    #Zhao.Pan@MULTIMEDIA.AUDIODRIVER.HAL, 2020/08/25, Add for audio hal feedback
+    chown media media /proc/mm_fb
+    #endif /* OPLUS_FEATURE_MM_FEEDBACK */
+
+    #ifdef OPLUS_FEATURE_SENSOR
+    #tangjh@PSW.BSP.SENSOR, 2020/07/30,add for sensor slpi ramdump
+    mkdir /data/vendor/mmdump/slpi 0777 system system
+    chmod 0777 /data/vendor/mmdump/slpi
+    #endif /* OPLUS_FEATURE_SENSOR */
+
+    #ifdef OPLUS_FEATURE_CAMERA_COMMON
+    #Feiping.Li@CAMERA.DRV, 20201209, add for camera dualcalibration data
+    chown cameraserver cameraserver /mnt/vendor/persist/camera/dual_calibration/stereoParams.bin
+    chown cameraserver cameraserver /mnt/vendor/persist/camera/front_dual_calibration/stereoParams.bin
+    chmod 0644 /mnt/vendor/persist/camera/dual_calibration/stereoParams.bin
+    chmod 0644 /mnt/vendor/persist/camera/front_dual_calibration/stereoParams.bin
+    #endif /* OPLUS_FEATURE_CAMERA_COMMON*/
+
+
+on init
+    #Jiemin.Zhu@PSW.Android.SdardFs, 2017/12/12, Add for sdcardfs delete dcim record
+    chown root system /proc/fs/sdcardfs/skipd_delete
+    chmod 0664 /proc/fs/sdcardfs/skipd_delete
+    chown root system /sys/module/sdcardfs/parameters/skipd_enable
+    chmod 0664 /sys/module/sdcardfs/parameters/skipd_enable
+    chown root system /sys/module/sdcardfs/parameters/extra_enable
+    chmod 0664 /sys/module/sdcardfs/parameters/extra_enable
+
+on boot
+    #Yilong.Wei@PSW.NW.RF.1178789, 2017/12/11
+    #add for Screen MIPI frequency interference GSM reception
+    chmod 0664  /sys/kernel/oppo_display/panel/dynamic_dsi_clock
+    chown radio root  /sys/kernel/oppo_display/panel/dynamic_dsi_clock
+#Le.Li@SWDP.MM.Audio.SmartPa, 2018/12/08, Add for smartPa calibrate
+    mkdir /mnt/vendor/persist/media 0775 media media
+
+#Liangwen.Ke@PSW.CN.BT.Basic.Customize.2120948, 2019/06/26,
+#Add for supporting QC firmware update by sau_res
+on post-fs-data
+#Avinash.Pandey@PSW.CN.BT.Basic.Customize.ALM-530653, 2020/10/28,
+#change permission of /data/vendor for supporting QC firmware update by sau_res for non NFC models
+    chmod 0777 /data/vendor
+    chmod 0777 /data/vendor/bluetooth
+    mkdir /data/vendor/bluetooth/fw 0777 bluetooth bluetooth
+
+#ifdef VENDOR_EDIT
+#Wen.Luo@BSP.Kernel.Stability, 2020/04/11, enable Death Healer
+on late-init
+    write /proc/sys/kernel/hung_task_timeout_secs 60
+    write /proc/sys/kernel/hung_task_selective_monitoring 0
+#endif
+
+#ifdef OPLUS_FEATURE_APPDATA_SERVICE
+#LiSongting@ANDROID.FRAMEWORK 2020.5.11 Add for BackupRestore . alm id 23493
+service oppo_app_data /system/system_ext/bin/oppo_app_data
+    user root
+    group root system
+    oneshot
+
+on property:oppo.appdataservice.status=1
+    start oppo_app_data
+
+on property:oppo.appdataservice.status=0
+    stop oppo_app_data
+#endif /* OPLUS_FEATURE_APPDATA_SERVICE */
+
+#ifdef OPLUS_FEATURE_SCREENMODE
+#Mingfeng.Zhu, 2019/12/17, Add for transimitting data,only 8250Q
+    chown root system /proc/touchpanel/report_rate_white_list
+    chmod 0660 /proc/touchpanel/report_rate_white_list
+#endif /* OPLUS_FEATURE_SCREENMODE */
+
+#ifdef OPLUS_FEATURE_MEMLEAK_DETECT
+#Hailong.Liu@ANDROID.MM, 2020/03/18, add for svelte logger
+on boot
+    chown system system /dev/svelte_log
+    chmod 0622 /dev/svelte_log
+#endif /* OPLUS_FEATURE_MEMLEAK_DETECT */
+
+#yangmingjin@BSP.CHG.Basic 2019/05/24 add for work mode set
+on boot
+    chown radio system /proc/da9313/work_mode
+    chmod 0664  /proc/da9313/work_mode
